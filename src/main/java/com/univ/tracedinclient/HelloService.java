@@ -10,6 +10,7 @@ public class HelloService {
     private final HelloRepository helloRepository;
 
     public void hello() {
+
         helloRepository.hello();
     }
 
