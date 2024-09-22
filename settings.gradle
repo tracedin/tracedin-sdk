@@ -1,3 +1,4 @@
 rootProject.name = 'tracedin-client'
 
 include('tracedin-sdk')
+include('tracedin-service')

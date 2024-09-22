@@ -6,3 +6,8 @@ traced-in:
   service-name: tracedin-client
   base-package: com.univ.tracedinclient
   exporter: logging
+
+logging:
+  level:
+    org.springframework.web.client.RestTemplate: DEBUG
+    org.springframework.http.client: DEBUG

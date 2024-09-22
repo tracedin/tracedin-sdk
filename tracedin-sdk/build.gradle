@@ -25,6 +25,7 @@ dependencies {
         exclude group: 'io.opentelemetry', module: 'opentelemetry-sdk'
     }
 
+    implementation 'org.springframework.boot:spring-boot-starter-tomcat:3.3.3'
     implementation 'org.springframework.boot:spring-boot-starter-json:3.3.3'
     implementation 'org.springframework.boot:spring-boot-starter-aop:3.3.3'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
