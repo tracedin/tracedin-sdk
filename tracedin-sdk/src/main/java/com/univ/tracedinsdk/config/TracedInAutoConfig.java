@@ -15,7 +15,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
-@AutoConfiguration
+
 @ConditionalOnProperty(prefix = "traced-in", name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(TracedInProperties.class)
 public class TracedInAutoConfig {
