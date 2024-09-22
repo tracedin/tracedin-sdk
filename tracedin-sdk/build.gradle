@@ -28,6 +28,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-json:3.3.3'
     implementation 'org.springframework.boot:spring-boot-starter-aop:3.3.3'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
+
+    // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+    implementation 'com.zaxxer:HikariCP:5.1.0'
 }
 
 publishing {

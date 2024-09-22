@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
-@AutoConfiguration
+
 @ConditionalOnProperty(prefix = "traced-in", name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(TracedInProperties.class)
 public class TracedInAutoConfig {
@@ -27,10 +27,5 @@ public class TracedInAutoConfig {
     @Bean
     public Advisor tracingAspectConfiguration() {
         return new TracingAspectConfig(properties).tracingAdvisor();
-    }
-
-    @Bean
-    public DataSourceBeanPostProcessor dataSourceBeanPostProcessor() {
-        return new DataSourceBeanPostProcessor();
     }
 }
