@@ -18,28 +18,16 @@ repositories {
 }
 
 dependencies {
-    // OpenTelemetry API 및 SDK
-    implementation 'io.opentelemetry:opentelemetry-sdk:1.42.0'
+    implementation 'io.opentelemetry:opentelemetry-sdk:1.37.0'
 
-    // OpenTelemetry 확장 (어노테이션 등)
-    implementation 'io.opentelemetry:opentelemetry-extension-annotations:1.18.0'
+    implementation('io.opentelemetry.instrumentation:opentelemetry-jdbc:2.3.0-alpha') {
+        exclude group: 'io.opentelemetry', module: 'opentelemetry-api'
+        exclude group: 'io.opentelemetry', module: 'opentelemetry-sdk'
+    }
 
-    implementation 'org.springframework.boot:spring-boot-configuration-processor:3.3.3'
-
-    implementation 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:2.8.0'
-
-    // JDBC 계층 추적을 위한 의존성
-    implementation 'io.opentelemetry.instrumentation:opentelemetry-jdbc:2.8.0-alpha'
-
-    // AOP를 위한 스프링 의존성 (메서드 추적)
-    implementation 'org.springframework.boot:spring-boot-starter-aop:3.3.3'
-
-    //spring-json
     implementation 'org.springframework.boot:spring-boot-starter-json:3.3.3'
-
+    implementation 'org.springframework.boot:spring-boot-starter-aop:3.3.3'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
-
-
 }
 
 publishing {
@@ -49,3 +37,4 @@ publishing {
         }
     }
 }
+
