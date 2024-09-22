@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:db
+
+traced-in:
+  service-name: tracedin-client
+  base-package: com.univ.tracedinclient
+  exporter: logging
