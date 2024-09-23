@@ -36,6 +36,7 @@ public class LoggingSpanExporter implements SpanExporter {
         // 필요한 필드만 선택적으로 포함할 수 있습니다.
         StringBuilder sb = new StringBuilder();
         sb.append("Span {")
+                .append("ServiceName=").append(spanData.getResource().getAttributes()).append(", ")
                 .append("TraceId=").append(spanData.getTraceId()).append(", ")
                 .append("SpanId=").append(spanData.getSpanId()).append(", ")
                 .append("ParentSpanId=").append(spanData.getParentSpanId()).append(", ")
