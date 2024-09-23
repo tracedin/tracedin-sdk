@@ -12,6 +12,7 @@ import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -19,11 +20,13 @@ public class OpenTelemetryInitializer {
 
 
     public static void initialize(TracedInProperties properties) {
-        // 서비스 이름 설정
+
         Resource resource = Resource.getDefault().merge(
                 Resource.create(Attributes.builder()
                         .put("service.name", properties.getServiceName())
                         .build()));
+
+        Sampler sampler = Sampler.traceIdRatioBased(properties.getSampling());
 
         SdkTracerProvider tracerProvider = switch (properties.getExporter().toLowerCase()) {
             case "traced-in" -> {
@@ -32,6 +35,7 @@ public class OpenTelemetryInitializer {
                 yield SdkTracerProvider.builder()
                         .addSpanProcessor(BatchSpanProcessor.builder(tracedInExporter).build())
                         .setResource(resource)
+                        .setSampler(sampler)
                         .build();
             }
             case "logging" -> {

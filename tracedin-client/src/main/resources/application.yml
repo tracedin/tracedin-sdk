@@ -6,6 +6,7 @@ traced-in:
   service-name: tracedin-client
   base-package: com.univ.tracedinclient
   exporter: logging
+  sampling: 0.5
 
 logging:
   level:
