@@ -3,19 +3,18 @@ package com.univ.tracedinsdk.exporter;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Collection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class LoggingSpanExporter implements SpanExporter {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoggingSpanExporter.class);
 
     @Override
     public CompletableResultCode export(Collection<SpanData> spans) {
         for (SpanData span : spans) {
             // 스팬 데이터를 로그로 출력
-            logger.info("Exporting span: {}", spanToString(span));
+            log.info("Exporting span: {}", spanToString(span));
         }
         return CompletableResultCode.ofSuccess();
     }

@@ -3,18 +3,17 @@ package com.univ.tracedinsdk.aspect;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapPropagator;
-import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 
-public class TracedInRestTemplateInterceptor implements ClientHttpRequestInterceptor {
+import java.io.IOException;
 
-    private static final Logger logger = LoggerFactory.getLogger(TracedInRestTemplateInterceptor.class);
+@Slf4j
+public class TracedInRestTemplateInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
@@ -27,7 +26,7 @@ public class TracedInRestTemplateInterceptor implements ClientHttpRequestInterce
         // 요청 헤더에 Trace 정보를 추가
         propagator.inject(currentContext, request.getHeaders(), HttpHeaders::set);
 
-        logger.info("Request to {}", request.getHeaders());
+        log.info("Request to {}", request.getHeaders());
         return execution.execute(request, body);
     }
 

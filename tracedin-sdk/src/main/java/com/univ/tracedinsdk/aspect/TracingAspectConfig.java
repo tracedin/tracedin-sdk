@@ -17,17 +17,9 @@ public class TracingAspectConfig {
 
     @Bean
     public Advisor tracingAdvisor() {
-        String basePackage = properties.getBasePackage();
-        String pointcutExpression;
-        if (basePackage != null && !basePackage.isEmpty()) {
-            pointcutExpression = "execution(* " + basePackage +
-                    "..*(..))";
-        } else {
-            pointcutExpression = "execution(* *(..))";
-        }
+        String pointcutExpression = properties.getPointcutExpression();
 
-        AspectJExpressionPointcut pointcut =
-                new AspectJExpressionPointcut();
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
         pointcut.setExpression(pointcutExpression);
 
         Advice advice = new TracingInterceptor();

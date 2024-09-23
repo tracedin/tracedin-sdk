@@ -12,12 +12,10 @@ import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class OpenTelemetryInitializer {
-
-    private static final Logger logger = LoggerFactory.getLogger(OpenTelemetryInitializer.class);
 
 
     public static void initialize(TracedInProperties properties) {
@@ -29,7 +27,7 @@ public class OpenTelemetryInitializer {
 
         SdkTracerProvider tracerProvider = switch (properties.getExporter().toLowerCase()) {
             case "traced-in" -> {
-                logger.info("Initialized OpenTelemetry with TracedInExporter to endpoint: {}", properties.getEndpoint());
+                log.info("Initialized OpenTelemetry with TracedInExporter to endpoint: {}", properties.getEndpoint());
                 TracedInExporter tracedInExporter = new TracedInExporter(properties.getEndpoint());
                 yield SdkTracerProvider.builder()
                         .addSpanProcessor(BatchSpanProcessor.builder(tracedInExporter).build())
@@ -37,7 +35,7 @@ public class OpenTelemetryInitializer {
                         .build();
             }
             case "logging" -> {
-                logger.info("Initialized OpenTelemetry with LoggingSpanExporter");
+                log.info("Initialized OpenTelemetry with LoggingSpanExporter");
                 LoggingSpanExporter loggingExporter = new LoggingSpanExporter();
                 yield SdkTracerProvider.builder()
                         .addSpanProcessor(BatchSpanProcessor.builder(loggingExporter).build())

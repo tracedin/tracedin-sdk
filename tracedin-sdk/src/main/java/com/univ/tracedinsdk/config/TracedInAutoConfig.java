@@ -4,8 +4,7 @@ import com.univ.tracedinsdk.OpenTelemetryInitializer;
 import com.univ.tracedinsdk.aspect.TracedInRestTemplateInterceptor;
 import com.univ.tracedinsdk.aspect.TracingAspectConfig;
 import com.univ.tracedinsdk.filter.ContextPropagateFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.Advisor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,17 +14,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 
+@Slf4j
 @ConditionalOnProperty(prefix = "traced-in", name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(TracedInProperties.class)
 public class TracedInAutoConfig {
 
     private final TracedInProperties properties;
-    private static final Logger logger = LoggerFactory.getLogger(TracedInAutoConfig.class);
 
     public TracedInAutoConfig(TracedInProperties properties) {
         this.properties = properties;
         OpenTelemetryInitializer.initialize(properties);
-        logger.info("TracedIn initialized with service name: {}", properties.getServiceName());
+        log.info("TracedIn initialized with service name: {}", properties.getServiceName());
     }
 
     @Bean
@@ -38,11 +37,6 @@ public class TracedInAutoConfig {
         return new RestTemplateBuilder()
                 .additionalInterceptors(new TracedInRestTemplateInterceptor())
                 .build();
-    }
-
-    @Bean
-    public DataSourceBeanPostProcessor dataSourceBeanPostProcessor() {
-        return new DataSourceBeanPostProcessor();
     }
 
     @Bean
