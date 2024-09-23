@@ -1,7 +1,8 @@
 package com.univ.tracedinsdk.config;
 
 import com.univ.tracedinsdk.OpenTelemetryInitializer;
-import com.univ.tracedinsdk.aspect.TracedInRestTemplateInterceptor;
+import com.univ.tracedinsdk.http.TracedInFeignClientInterceptor;
+import com.univ.tracedinsdk.http.TracedInRestTemplateInterceptor;
 import com.univ.tracedinsdk.aspect.TracingAspectConfig;
 import com.univ.tracedinsdk.filter.ContextPropagateFilter;
 import lombok.extern.slf4j.Slf4j;
@@ -45,5 +46,10 @@ public class TracedInAutoConfig {
         registrationBean.setFilter(new ContextPropagateFilter());
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
+    }
+
+    @Bean
+    public TracedInFeignClientInterceptor tracedInFeignClientInterceptor() {
+        return new TracedInFeignClientInterceptor();
     }
 }

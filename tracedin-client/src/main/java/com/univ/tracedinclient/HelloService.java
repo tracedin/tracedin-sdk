@@ -10,16 +10,15 @@ public class HelloService {
 
     private final HelloRepository helloRepository;
     private final RestTemplate restTemplate;
+    private final ServiceClient serviceClient;
 
     public void hello() {
-        // 요청할 URL
-        String url = "http://localhost:8081/hello";
-
-        // GET 요청 보내고 응답 받기
-        String response = restTemplate.getForObject(url, String.class);
+//        String url = "http://localhost:8081/hello";
+//        String response = restTemplate.getForObject(url, String.class);
+        String hello = serviceClient.hello();
 
         // 응답 출력
-        System.out.println("Response from API: " + response);
+        System.out.println("Response from API: " + hello);
         helloRepository.hello();
     }
 

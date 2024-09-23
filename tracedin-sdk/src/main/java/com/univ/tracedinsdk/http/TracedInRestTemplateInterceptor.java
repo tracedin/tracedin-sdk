@@ -1,4 +1,4 @@
-package com.univ.tracedinsdk.aspect;
+package com.univ.tracedinsdk.http;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.context.Context;
@@ -17,16 +17,10 @@ public class TracedInRestTemplateInterceptor implements ClientHttpRequestInterce
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        // 현재 컨텍스트 가져오기
-        Context currentContext = Context.current();
-
-        // W3C Trace Context 헤더를 추가하기 위한 Propagator 설정
         TextMapPropagator propagator = GlobalOpenTelemetry.getPropagators().getTextMapPropagator();
+        propagator.inject(Context.current(), request.getHeaders(), HttpHeaders::set);
 
-        // 요청 헤더에 Trace 정보를 추가
-        propagator.inject(currentContext, request.getHeaders(), HttpHeaders::set);
-
-        log.info("Request to {}", request.getHeaders());
+        log.info("Request: {}", request.getHeaders());
         return execution.execute(request, body);
     }
 
