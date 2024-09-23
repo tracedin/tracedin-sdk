@@ -46,3 +46,6 @@ publishing {
     }
 }
 
+bootJar {
+    enabled = false
+}
