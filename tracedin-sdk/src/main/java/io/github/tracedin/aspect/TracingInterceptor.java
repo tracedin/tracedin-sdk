@@ -1,7 +1,7 @@
-package com.univ.tracedinsdk.aspect;
+package io.github.tracedin.aspect;
 
 
-import com.univ.tracedinsdk.OpenTelemetryInitializer;
+import io.github.tracedin.OpenTelemetryInitializer;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;

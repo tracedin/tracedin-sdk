@@ -1,8 +1,8 @@
-package com.univ.tracedinsdk;
+package io.github.tracedin;
 
-import com.univ.tracedinsdk.config.TracedInProperties;
-import com.univ.tracedinsdk.exporter.LoggingSpanExporter;
-import com.univ.tracedinsdk.exporter.TracedInExporter;
+import io.github.tracedin.config.TracedInProperties;
+import io.github.tracedin.exporter.LoggingSpanExporter;
+import io.github.tracedin.exporter.TracedInExporter;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;

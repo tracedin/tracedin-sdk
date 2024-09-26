@@ -1,4 +1,4 @@
-package com.univ.tracedinsdk.http;
+package io.github.tracedin.http;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;

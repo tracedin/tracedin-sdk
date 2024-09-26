@@ -1,6 +1,6 @@
-package com.univ.tracedinsdk.filter;
+package io.github.tracedin.filter;
 
-import com.univ.tracedinsdk.OpenTelemetryInitializer;
+import io.github.tracedin.OpenTelemetryInitializer;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;

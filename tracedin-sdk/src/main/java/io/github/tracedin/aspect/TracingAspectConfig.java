@@ -1,6 +1,6 @@
-package com.univ.tracedinsdk.aspect;
+package io.github.tracedin.aspect;
 
-import com.univ.tracedinsdk.config.TracedInProperties;
+import io.github.tracedin.config.TracedInProperties;
 import org.aopalliance.aop.Advice;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;

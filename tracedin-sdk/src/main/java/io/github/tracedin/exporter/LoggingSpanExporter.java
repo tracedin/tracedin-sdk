@@ -1,4 +1,4 @@
-package com.univ.tracedinsdk.exporter;
+package io.github.tracedin.exporter;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.common.CompletableResultCode;

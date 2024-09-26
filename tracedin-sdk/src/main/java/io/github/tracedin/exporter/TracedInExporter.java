@@ -1,4 +1,4 @@
-package com.univ.tracedinsdk.exporter;
+package io.github.tracedin.exporter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

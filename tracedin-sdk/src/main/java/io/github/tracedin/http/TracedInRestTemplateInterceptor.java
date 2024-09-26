@@ -1,4 +1,4 @@
-package com.univ.tracedinsdk.http;
+package io.github.tracedin.http;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.context.Context;

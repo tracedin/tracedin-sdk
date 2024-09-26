@@ -1,6 +1,6 @@
-package com.univ.tracedinsdk.config;
+package io.github.tracedin.config;
 
-import com.univ.tracedinsdk.OpenTelemetryInitializer;
+import io.github.tracedin.OpenTelemetryInitializer;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.jdbc.datasource.JdbcTelemetry;
 import lombok.extern.slf4j.Slf4j;

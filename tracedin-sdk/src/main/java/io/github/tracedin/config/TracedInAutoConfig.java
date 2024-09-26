@@ -1,10 +1,10 @@
-package com.univ.tracedinsdk.config;
+package io.github.tracedin.config;
 
-import com.univ.tracedinsdk.OpenTelemetryInitializer;
-import com.univ.tracedinsdk.http.TracedInFeignClientInterceptor;
-import com.univ.tracedinsdk.http.TracedInRestTemplateInterceptor;
-import com.univ.tracedinsdk.aspect.TracingAspectConfig;
-import com.univ.tracedinsdk.filter.ContextPropagateFilter;
+import io.github.tracedin.OpenTelemetryInitializer;
+import io.github.tracedin.http.TracedInFeignClientInterceptor;
+import io.github.tracedin.http.TracedInRestTemplateInterceptor;
+import io.github.tracedin.aspect.TracingAspectConfig;
+import io.github.tracedin.filter.ContextPropagateFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.Advisor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

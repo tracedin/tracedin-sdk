@@ -1,4 +1,4 @@
-package com.univ.tracedinsdk.config;
+package io.github.tracedin.config;
 
 import java.util.UUID;
 import lombok.Getter;
