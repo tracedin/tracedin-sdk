@@ -1,11 +1,20 @@
+import com.vanniktech.maven.publish.SonatypeHost
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+
 plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
+    id 'com.vanniktech.maven.publish' version '0.29.0'
+    id 'signing'
 }
 
-group = 'com.univ'
-version = '0.0.1'
+group = 'io.github.tracedin'
+version = '0.0.4'
+
+def artifact = 'tracedin-sdk'
+
 
 java {
     toolchain {
@@ -40,14 +49,48 @@ dependencies {
     implementation 'com.zaxxer:HikariCP:5.1.0'
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
+signing {
+    useGpgCmd()
+    sign publishing.publications
 }
 
-bootJar {
-    enabled = false
+mavenPublishing {
+    configure(new JavaLibrary(new JavadocJar.Empty(), true))
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, true)
+    coordinates(group, artifact, version)
+
+    pom {
+        name = artifact
+        description = 'Tracedin Application SDK for Java'
+        url = 'https://tracedin.github.io'
+
+        licenses {
+            license {
+                name = 'MIT License'
+                url = 'https://opensource.org/license/MIT'
+            }
+        }
+
+        developers {
+            developer {
+                name = 'Jiwon KKang'
+                email = 'rkdwldnjs878@gmail.com'
+                organization = 'Chungbuk National Univ'
+                organizationUrl = 'https://github.com/JiwonKKang'
+
+            }
+            developer {
+                name = 'Sukkyun Hong'
+                email = 'goobghd@gmail.com'
+                organization = 'Chungbuk National Univ'
+                organizationUrl = 'https://github.com/sukkyun2'
+            }
+        }
+
+        scm {
+            connection = 'scm:git:github.com/tracedin/tracein-sdk.git'
+            developerConnection = 'scm:git:ssh://github.com/tracedin/tracein-sdk'
+            url = 'https://github.com/tracedin/tracein-sdk/tree/main'
+        }
+    }
 }
