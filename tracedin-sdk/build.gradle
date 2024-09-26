@@ -36,7 +36,7 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-tomcat:3.3.3'
     implementation 'org.springframework.boot:spring-boot-starter-json:3.3.3'
-    implementation 'org.springframework.boot:spring-boot-starter-aop:3.3.3'
+    implementation 'org.springframework.boot:spring-boot-starter-aop:3.3.4'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
 
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.3'
