@@ -1,0 +1,59 @@
+name: push
+
+on:
+  push:
+    branches: [ 'main' ]
+
+env:
+  JAVA_VERSION: '17'
+  DISTRIBUTION: 'temurin'
+
+defaults:
+  run:
+    working-directory: tracedin-sdk
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.DISTRIBUTION }}
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew clean build -x test
+
+  checkstyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dbelyaev/action-checkstyle@master
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          checkstyle_config: google_checks.xml
+          level: warning
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Run Gradle tests
+        run: ./gradlew test
+
+  codeql:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
