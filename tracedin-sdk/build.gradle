@@ -29,7 +29,7 @@ repositories {
 dependencies {
     implementation 'io.opentelemetry:opentelemetry-sdk:1.37.0'
 
-    implementation('io.opentelemetry.instrumentation:opentelemetry-jdbc:2.3.0-alpha') {
+    implementation('io.opentelemetry.instrumentation:opentelemetry-jdbc:2.8.0-alpha') {
         exclude group: 'io.opentelemetry', module: 'opentelemetry-api'
         exclude group: 'io.opentelemetry', module: 'opentelemetry-sdk'
     }
