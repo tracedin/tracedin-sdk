@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import lombok.extern.slf4j.Slf4j;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -14,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Slf4j
 public class TracedInExporter implements SpanExporter {
 
     private final String endpoint;
@@ -23,62 +25,83 @@ public class TracedInExporter implements SpanExporter {
 
     public TracedInExporter(String endpoint) {
         this.endpoint = endpoint;
-        this.httpClient = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .build();
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        this.httpClient = createDefaultHttpClient();
+        this.objectMapper = createDefaultObjectMapper();
         this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     @Override
     public CompletableResultCode export(Collection<SpanData> spans) {
         CompletableResultCode resultCode = new CompletableResultCode();
+
         CompletableFuture.runAsync(() -> {
-            try {
-                for (SpanData span : spans) {
-                    // SpanData를 JSON으로 직렬화
-                    String json = serializeSpanDataToJson(span);
+            boolean success = spans.stream()
+                    .allMatch(this::sendSpan);
 
-                    // HTTP 클라이언트를 사용하여 서버로 전송
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create(endpoint))
-                            .header("Content-Type", "application/json")
-                            .POST(HttpRequest.BodyPublishers.ofString(json))
-                            .build();
-
-                    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                    // 응답 처리
-                    if (response.statusCode() != 200) {
-                        resultCode.fail();
-                        return;
-                    }
-                }
+            if (success) {
                 resultCode.succeed();
-            } catch (Exception e) {
-                e.printStackTrace();
+                log.info("Successfully exported all spans.");
+            } else {
                 resultCode.fail();
+                log.error("Failed to export some spans.");
             }
         }, executorService);
 
         return resultCode;
     }
 
+    private boolean sendSpan(SpanData spanData) {
+        try {
+            String json = serializeSpanDataToJson(spanData);
+            HttpRequest request = buildHttpRequest(json);
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                log.error("Failed to send span. Status code: {}, Response: {}", response.statusCode(), response.body());
+                return false;
+            }
+
+            log.info("Successfully sent span: {}", spanData.getSpanId());
+            return true;
+        } catch (Exception e) {
+            log.error("Error while sending span: {}", spanData.getSpanId(), e);
+            return false;
+        }
+    }
+
+    private HttpRequest buildHttpRequest(String json) {
+        return HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+    }
+
+    private String serializeSpanDataToJson(SpanData spanData) throws Exception {
+        return objectMapper.writeValueAsString(spanData);
+    }
+
     @Override
     public CompletableResultCode flush() {
-        // 필요한 경우 flush 로직 구현
         return CompletableResultCode.ofSuccess();
     }
 
     @Override
     public CompletableResultCode shutdown() {
         executorService.shutdown();
+        log.info("ExecutorService has been shut down.");
         return CompletableResultCode.ofSuccess();
     }
 
-    private String serializeSpanDataToJson(SpanData spanData) throws Exception {
-        // 필요한 데이터만 추출하여 JSON으로 변환
-        return objectMapper.writeValueAsString(spanData);
+    private HttpClient createDefaultHttpClient() {
+        return HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .build();
+    }
+
+    private ObjectMapper createDefaultObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        return mapper;
     }
 }

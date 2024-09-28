@@ -8,4 +8,6 @@ spring:
 traced-in:
   service-name: tracedin-service
   base-package: com.univ.tracedinservice
-  exporter: logging
+  exporter: traced-in
+  endpoint: http://localhost:8989/api/v1/spans
+  sampling: 0.5
