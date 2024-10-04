@@ -1,5 +1,6 @@
 package io.github.tracedin.config;
 
+import jakarta.annotation.PostConstruct;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +32,8 @@ public class TracedInProperties implements ApplicationContextAware {
 
     private double sampling = 1.0;
 
-    @Getter
+    public String projectKey;
+
     private String basePackage;
 
     private ApplicationContext applicationContext;
@@ -58,6 +60,13 @@ public class TracedInProperties implements ApplicationContextAware {
             } else {
                 throw new IllegalStateException("Cannot determine base package. Please set basePackage property.");
             }
+        }
+    }
+
+    @PostConstruct
+    public void validateProjectKey() {
+        if (!StringUtils.hasText(this.projectKey)) {
+            throw new IllegalStateException("프로젝트 키가 등록되지 않았습니다. 프로젝트 키를 발급받고 traced-in.project-key 속성을 설정해주세요.");
         }
     }
 

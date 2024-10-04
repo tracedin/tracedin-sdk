@@ -36,20 +36,20 @@ public class TracedInAutoConfig {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplateBuilder()
-                .additionalInterceptors(new TracedInRestTemplateInterceptor())
+                .additionalInterceptors(new TracedInRestTemplateInterceptor(properties))
                 .build();
     }
 
     @Bean
     public FilterRegistrationBean<ContextPropagateFilter> loggingFilter() {
         FilterRegistrationBean<ContextPropagateFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new ContextPropagateFilter());
+        registrationBean.setFilter(new ContextPropagateFilter(properties));
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
     }
 
     @Bean
     public TracedInFeignClientInterceptor tracedInFeignClientInterceptor() {
-        return new TracedInFeignClientInterceptor();
+        return new TracedInFeignClientInterceptor(properties);
     }
 }

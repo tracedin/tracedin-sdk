@@ -39,9 +39,12 @@ public class LoggingSpanExporter implements SpanExporter {
         sb.append("Span {")
                 .append("ServiceName=").append(spanData.getResource().getAttributes().get(
                         AttributeKey.stringKey("service.name"))).append(", ")
+                .append("ProjectKey=").append(spanData.getResource().getAttributes().get(
+                        AttributeKey.stringKey("project.key"))).append(", ")
                 .append("TraceId=").append(spanData.getTraceId()).append(", ")
                 .append("SpanId=").append(spanData.getSpanId()).append(", ")
                 .append("ParentSpanId=").append(spanData.getParentSpanId()).append(", ")
+                .append("SpanType=").append(spanData.getAttributes().get(AttributeKey.stringKey("span.type"))).append(", ")
                 .append("Name=").append(spanData.getName()).append(", ")
                 .append("Kind=").append(spanData.getKind()).append(", ")
                 .append("StartEpochNanos=").append(spanData.getStartEpochNanos()).append(", ")

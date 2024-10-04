@@ -10,8 +10,14 @@ public class HelloRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public void hello() {
+    public void createTable() {
         jdbcTemplate.execute("create table hello (id int, name varchar(100))");
     }
+
+    public void insertData() {
+        jdbcTemplate.execute("insert into hello values (1, 'Hello')");
+    }
+
+
 
 }

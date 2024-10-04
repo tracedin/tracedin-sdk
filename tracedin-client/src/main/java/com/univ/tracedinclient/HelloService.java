@@ -9,17 +9,18 @@ import org.springframework.web.client.RestTemplate;
 public class HelloService {
 
     private final HelloRepository helloRepository;
-    private final RestTemplate restTemplate;
     private final ServiceClient serviceClient;
 
     public void hello() {
-//        String url = "http://localhost:8081/hello";
-//        String response = restTemplate.getForObject(url, String.class);
         String hello = serviceClient.hello();
-
-        // 응답 출력
+        String insert = serviceClient.insert();
         System.out.println("Response from API: " + hello);
+        System.out.println("Response from API: " + insert);
         helloRepository.hello();
     }
 
+    public void insert() {
+        String insert = serviceClient.insert();
+        System.out.println("Response from API: " + insert);
+    }
 }

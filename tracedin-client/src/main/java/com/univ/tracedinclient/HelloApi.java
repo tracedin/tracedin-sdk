@@ -16,5 +16,11 @@ public class HelloApi {
         return "Hello, World!";
     }
 
+    @GetMapping("/insert")
+    public String insert() {
+        helloService.insert();
+        return "Data inserted!";
+    }
+
 
 }

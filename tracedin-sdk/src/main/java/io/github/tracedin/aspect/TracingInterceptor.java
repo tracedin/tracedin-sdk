@@ -4,7 +4,9 @@ package io.github.tracedin.aspect;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.tracedin.OpenTelemetryInitializer;
+import io.github.tracedin.config.TracedInProperties;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
@@ -18,9 +20,9 @@ public class TracingInterceptor implements MethodInterceptor {
 
     private final Tracer tracer;
 
-    public TracingInterceptor(String serviceName) {
+    public TracingInterceptor(TracedInProperties properties) {
         this.tracer = OpenTelemetryInitializer.getOpenTelemetry()
-                .getTracer(serviceName);
+                .getTracer(properties.getBasePackage());
     }
 
     @Override
@@ -29,8 +31,13 @@ public class TracingInterceptor implements MethodInterceptor {
 
         Span span = tracer.spanBuilder(extractAdapter.getFullMethodName())
                 .setParent(Context.current())
+                .setSpanKind(SpanKind.INTERNAL) // 스팬 종류 설정
                 .startSpan();
 
+        // 메서드 입력 파라미터를 속성으로 추가
+
+        span.setAttribute("span.type", "method");
+        addAllParameter(span, extractAdapter.extractParameters());
         try (Scope scope = span.makeCurrent()) {
             Object result = invocation.proceed();
 

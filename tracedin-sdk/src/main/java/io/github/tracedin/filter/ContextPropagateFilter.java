@@ -1,8 +1,10 @@
 package io.github.tracedin.filter;
 
 import io.github.tracedin.OpenTelemetryInitializer;
+import io.github.tracedin.config.TracedInProperties;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
@@ -20,9 +22,9 @@ public class ContextPropagateFilter extends OncePerRequestFilter {
 
     private final Tracer tracer;
 
-    public ContextPropagateFilter() {
+    public ContextPropagateFilter(TracedInProperties properties) {
         this.tracer = OpenTelemetryInitializer.getOpenTelemetry()
-                .getTracer("com.univ.tracedinsdk");;
+                .getTracer(properties.getBasePackage());;
     }
 
     @Override
@@ -34,9 +36,11 @@ public class ContextPropagateFilter extends OncePerRequestFilter {
 
         Span span = tracer.spanBuilder(request.getRequestURI())
                 .setParent(extractedContext)
+                .setSpanKind(SpanKind.SERVER) // 스팬 종류 설정
                 .startSpan();
 
         try (Scope scope = span.makeCurrent()) {
+            span.setAttribute("span.type", "http");
             span.setAttribute("http.method", request.getMethod());
             span.setAttribute("http.url", request.getRequestURL().toString());
 

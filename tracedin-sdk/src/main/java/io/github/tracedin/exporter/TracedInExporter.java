@@ -2,9 +2,13 @@ package io.github.tracedin.exporter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import io.github.tracedin.exporter.AppendSpanRequest.Attributes;
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -78,7 +82,7 @@ public class TracedInExporter implements SpanExporter {
     }
 
     private String serializeSpanDataToJson(SpanData spanData) throws Exception {
-        return objectMapper.writeValueAsString(spanData);
+        return objectMapper.writeValueAsString(AppendSpanRequest.from(spanData));
     }
 
     @Override

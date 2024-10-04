@@ -6,6 +6,7 @@ import io.github.tracedin.exporter.TracedInExporter;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
@@ -24,9 +25,8 @@ public class OpenTelemetryInitializer {
         Resource resource = Resource.getDefault().merge(
                 Resource.create(Attributes.builder()
                         .put("service.name", properties.getServiceName())
+                        .put("project.key", properties.getProjectKey())
                         .build()));
-
-        Sampler sampler = Sampler.traceIdRatioBased(properties.getSampling());
 
         SdkTracerProvider tracerProvider = switch (properties.getExporter().toLowerCase()) {
             case "traced-in" -> {
@@ -35,7 +35,7 @@ public class OpenTelemetryInitializer {
                 yield SdkTracerProvider.builder()
                         .addSpanProcessor(BatchSpanProcessor.builder(tracedInExporter).build())
                         .setResource(resource)
-                        .setSampler(sampler)
+                        .setSampler(Sampler.traceIdRatioBased(properties.getSampling()))
                         .build();
             }
             case "logging" -> {

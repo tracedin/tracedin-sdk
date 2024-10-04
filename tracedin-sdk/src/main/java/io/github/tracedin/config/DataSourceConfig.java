@@ -17,7 +17,6 @@ public class DataSourceConfig {
     @Bean
     public DataSource dataSource(DataSourceProperties properties) {
         log.info("Initializing OpenTelemetry DataSource");
-
         OpenTelemetry openTelemetry = OpenTelemetryInitializer.getOpenTelemetry();
         DataSource dataSource = properties.initializeDataSourceBuilder().build();
         return JdbcTelemetry.create(openTelemetry).wrap(dataSource);

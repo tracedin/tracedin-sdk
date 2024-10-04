@@ -22,7 +22,7 @@ public class TracingAspectConfig {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
         pointcut.setExpression(pointcutExpression);
 
-        Advice advice = new TracingInterceptor(properties.getServiceName());
+        Advice advice = new TracingInterceptor(properties);
 
         return new DefaultPointcutAdvisor(pointcut, advice);
     }

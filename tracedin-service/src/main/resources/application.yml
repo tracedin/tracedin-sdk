@@ -9,5 +9,6 @@ traced-in:
   service-name: tracedin-service
   base-package: com.univ.tracedinservice
   exporter: traced-in
+  project-key: 1206887328-a7863a66-528e-4f37-b805-04e1314fb924
   endpoint: http://localhost:8989/api/v1/spans
-  sampling: 0.5
+  sampling: 1

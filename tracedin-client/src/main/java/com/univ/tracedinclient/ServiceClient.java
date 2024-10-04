@@ -11,4 +11,7 @@ public interface ServiceClient {
 
     @GetMapping("/hello")
     String hello();
+
+    @GetMapping("/insert")
+    String insert();
 }
