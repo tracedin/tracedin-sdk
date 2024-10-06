@@ -23,8 +23,9 @@ public class TracedInProperties implements ApplicationContextAware {
     /**
      * Exporter 엔드포인트 URL
      */
-    private String endpoint = "http://tracedin.p-e.kr:8080";
+    private String spanEndpoint = "http://tracedin.p-e.kr:8080/api/v1/spans";
 
+    private String metricEndpoint = "http://tracedin.p-e.kr:8080/api/v1/metrics";
 
     private String serviceName = "service-" + UUID.randomUUID();
 
@@ -35,6 +36,8 @@ public class TracedInProperties implements ApplicationContextAware {
     public String projectKey;
 
     private String basePackage;
+
+    private long metricInterval = 10;
 
     private ApplicationContext applicationContext;
 

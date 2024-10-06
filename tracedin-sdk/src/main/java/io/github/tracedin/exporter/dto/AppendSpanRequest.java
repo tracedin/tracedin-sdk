@@ -1,4 +1,4 @@
-package io.github.tracedin.exporter;
+package io.github.tracedin.exporter.dto;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.trace.data.EventData;

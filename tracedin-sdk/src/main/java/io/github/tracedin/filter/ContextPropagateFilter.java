@@ -1,8 +1,13 @@
 package io.github.tracedin.filter;
 
+
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+
 import io.github.tracedin.OpenTelemetryInitializer;
 import io.github.tracedin.config.TracedInProperties;
 import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
@@ -23,16 +28,24 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class ContextPropagateFilter extends OncePerRequestFilter {
 
     private final Tracer tracer;
+    private final LongCounter httpCounter;
 
     public ContextPropagateFilter(TracedInProperties properties) {
         this.tracer = OpenTelemetryInitializer.getOpenTelemetry()
                 .getTracer(properties.getBasePackage());;
+        this.httpCounter = GlobalOpenTelemetry.getMeter(properties.getBasePackage())
+                .counterBuilder("http.request.count")
+                .setDescription("Total HTTP request count")
+                .setUnit("1")
+                .build();
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
+
+        httpCounter.add(1, Attributes.of(stringKey("http.method"), request.getMethod(), stringKey("http.path"), request.getRequestURI()));
 
         Context extractedContext = getExtract(request);
 

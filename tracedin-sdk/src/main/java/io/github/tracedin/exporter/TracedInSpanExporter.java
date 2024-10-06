@@ -1,14 +1,13 @@
 package io.github.tracedin.exporter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import io.github.tracedin.exporter.AppendSpanRequest.Attributes;
-import io.opentelemetry.api.common.AttributeKey;
+import io.github.tracedin.exporter.dto.AppendSpanRequest;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -20,17 +19,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Slf4j
-public class TracedInExporter implements SpanExporter {
+public class TracedInSpanExporter implements SpanExporter {
 
     private final String endpoint;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
     private final ExecutorService executorService;
 
-    public TracedInExporter(String endpoint) {
+    public TracedInSpanExporter(String endpoint) {
         this.endpoint = endpoint;
-        this.httpClient = createDefaultHttpClient();
-        this.objectMapper = createDefaultObjectMapper();
+        this.httpClient = createHttpClient();
+        this.objectMapper = createObjectMapper();
         this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
@@ -39,8 +38,7 @@ public class TracedInExporter implements SpanExporter {
         CompletableResultCode resultCode = new CompletableResultCode();
 
         CompletableFuture.runAsync(() -> {
-            boolean success = spans.stream()
-                    .allMatch(this::sendSpan);
+            boolean success = sendSpan(spans);
 
             if (success) {
                 resultCode.succeed();
@@ -54,9 +52,9 @@ public class TracedInExporter implements SpanExporter {
         return resultCode;
     }
 
-    private boolean sendSpan(SpanData spanData) {
+    private boolean sendSpan(Collection<SpanData> spans) {
         try {
-            String json = serializeSpanDataToJson(spanData);
+            String json = serializeSpanDataToJson(spans);
             HttpRequest request = buildHttpRequest(json);
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -65,10 +63,10 @@ public class TracedInExporter implements SpanExporter {
                 return false;
             }
 
-            log.info("Successfully sent span: {}", spanData.getSpanId());
+            log.info("Successfully sent spans: {}", spans.stream().map(SpanData::getSpanId).toList());
             return true;
         } catch (Exception e) {
-            log.error("Error while sending span: {}", spanData.getSpanId(), e);
+            log.error("Error while sending spans: {}", spans.stream().map(SpanData::getSpanId).toList() , e);
             return false;
         }
     }
@@ -81,8 +79,13 @@ public class TracedInExporter implements SpanExporter {
                 .build();
     }
 
-    private String serializeSpanDataToJson(SpanData spanData) throws Exception {
-        return objectMapper.writeValueAsString(AppendSpanRequest.from(spanData));
+    private String serializeSpanDataToJson(Collection<SpanData> spanData) {
+        try {
+            List<AppendSpanRequest> requests = spanData.stream().map(AppendSpanRequest::from).toList();
+            return objectMapper.writeValueAsString(requests);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -97,13 +100,13 @@ public class TracedInExporter implements SpanExporter {
         return CompletableResultCode.ofSuccess();
     }
 
-    private HttpClient createDefaultHttpClient() {
+    public static HttpClient createHttpClient() {
         return HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .build();
     }
 
-    private ObjectMapper createDefaultObjectMapper() {
+    public static ObjectMapper createObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         return mapper;
