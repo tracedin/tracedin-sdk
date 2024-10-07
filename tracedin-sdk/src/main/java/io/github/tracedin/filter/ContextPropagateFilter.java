@@ -16,8 +16,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 public class ContextPropagateFilter extends OncePerRequestFilter {
 
     private final Tracer tracer;
@@ -39,30 +41,33 @@ public class ContextPropagateFilter extends OncePerRequestFilter {
                 .setSpanKind(SpanKind.SERVER) // 스팬 종류 설정
                 .startSpan();
 
+        long startTime = System.currentTimeMillis();
+
         try (Scope scope = span.makeCurrent()) {
             span.setAttribute("span.type", "http");
             span.setAttribute("http.method", request.getMethod());
             span.setAttribute("http.url", request.getRequestURL().toString());
-
-            long startTime = System.currentTimeMillis();
-
             filterChain.doFilter(request, response);
-
-            long duration = System.currentTimeMillis() - startTime;
-
-            span.setAttribute("http.status_code", response.getStatus());
-            span.setAttribute("http.client_ip", request.getRemoteAddr());
-            span.setAttribute("http.response_time_ms", duration);
         } catch (Exception ex) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             span.recordException(ex);
             span.setStatus(StatusCode.ERROR, ex.getMessage());
             throw ex;
         } finally {
+            long duration = System.currentTimeMillis() - startTime;
+            setSpanHttpAttribute(request, response, span, duration);
             span.end();
         }
     }
 
-    private static Context getExtract(HttpServletRequest request) {
+    private void setSpanHttpAttribute(HttpServletRequest request, HttpServletResponse response,
+            Span span, long duration) {
+        span.setAttribute("http.status_code", response.getStatus());
+        span.setAttribute("http.client_ip", request.getRemoteAddr());
+        span.setAttribute("http.response_time_ms", duration);
+    }
+
+    private Context getExtract(HttpServletRequest request) {
 
         TextMapGetter<HttpServletRequest> getter = new TextMapGetter<>() {
             @Override

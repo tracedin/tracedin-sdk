@@ -7,21 +7,25 @@ import io.github.tracedin.aspect.TracingAspectConfig;
 import io.github.tracedin.filter.ContextPropagateFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.Advisor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 
 @Slf4j
+@Configuration
 @ConditionalOnProperty(prefix = "traced-in", name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(TracedInProperties.class)
 public class TracedInAutoConfig {
 
     private final TracedInProperties properties;
 
+    @Autowired
     public TracedInAutoConfig(TracedInProperties properties) {
         this.properties = properties;
         OpenTelemetryInitializer.initialize(properties);
@@ -41,15 +45,16 @@ public class TracedInAutoConfig {
     }
 
     @Bean
-    public FilterRegistrationBean<ContextPropagateFilter> loggingFilter() {
+    public TracedInFeignClientInterceptor tracedInFeignClientInterceptor() {
+        return new TracedInFeignClientInterceptor(properties);
+    }
+
+    @Bean
+    public FilterRegistrationBean<ContextPropagateFilter> contextPropagateFilter() {
         FilterRegistrationBean<ContextPropagateFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new ContextPropagateFilter(properties));
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
     }
 
-    @Bean
-    public TracedInFeignClientInterceptor tracedInFeignClientInterceptor() {
-        return new TracedInFeignClientInterceptor(properties);
-    }
 }
