@@ -51,7 +51,7 @@ dependencies {
 }
 
 signing {
-    useGpgCmd()
+    useInMemoryPgpKeys(findProperty("signingKey"), findProperty("signingPassword"))
     sign publishing.publications
 }
 
