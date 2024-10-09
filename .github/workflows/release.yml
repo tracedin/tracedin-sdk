@@ -31,7 +31,8 @@ jobs:
       - name: Import GPG Keys
         run: |
           gpg --keyserver keyserver.ubuntu.com --recv-keys ${{ secrets.GPG_KEYS }}
-          gpg --list-keys
+          gpg --default-key ${{ secrets.GPG_KEYS }}
+          gpg --list-secret-keys
 
       - name: Publish to Maven Central
         env:
