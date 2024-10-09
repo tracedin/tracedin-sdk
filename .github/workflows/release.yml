@@ -28,6 +28,11 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
+      - name: Import GPG Keys
+        run: |
+          gpg --keyserver keyserver.ubuntu.com --recv-keys ${{ secrets.GPG_KEYS }}
+          gpg --list-keys
+
       - name: Publish to Maven Central
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
