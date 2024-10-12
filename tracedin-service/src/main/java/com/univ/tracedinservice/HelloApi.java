@@ -1,6 +1,7 @@
 package com.univ.tracedinservice;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,5 +23,8 @@ public class HelloApi {
         return "Data inserted!";
     }
 
-
+    @KafkaListener(topics = "hello", groupId = "hello-group")
+    public void listenHelloMessage(String message) {
+        System.out.printf("Hello, My Name is %s%n", message);
+    }
 }

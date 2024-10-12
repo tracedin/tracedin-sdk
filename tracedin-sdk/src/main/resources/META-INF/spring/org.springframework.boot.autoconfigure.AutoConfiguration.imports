@@ -1,2 +1,3 @@
 io.github.tracedin.config.TracedInAutoConfig
 io.github.tracedin.config.DataSourceConfig
+io.github.tracedin.config.KafkaConfig

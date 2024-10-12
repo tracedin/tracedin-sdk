@@ -1,6 +1,11 @@
 spring:
   datasource:
     url: jdbc:h2:mem:db
+  kafka:
+    producer:
+      bootstrap-servers: localhost:29092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 traced-in:
   service-name: tracedin-client
