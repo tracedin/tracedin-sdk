@@ -23,9 +23,7 @@ public class TracedInProperties implements ApplicationContextAware {
     /**
      * Exporter 엔드포인트 URL
      */
-    private String spanEndpoint = "http://tracedin.p-e.kr:8080/api/v1/spans";
-
-    private String metricEndpoint = "http://tracedin.p-e.kr:8080/api/v1/metrics";
+    private String endPoint = "http://localhost:8989";
 
     private String serviceName = "service-" + UUID.randomUUID();
 
@@ -71,6 +69,14 @@ public class TracedInProperties implements ApplicationContextAware {
         if (!StringUtils.hasText(this.projectKey)) {
             throw new IllegalStateException("프로젝트 키가 등록되지 않았습니다. 프로젝트 키를 발급받고 traced-in.project-key 속성을 설정해주세요.");
         }
+    }
+
+    public String getSpanEndpoint() {
+        return this.endPoint + "/api/v1/spans";
+    }
+
+    public String getMetricEndpoint() {
+        return this.endPoint + "/api/v1/metrics";
     }
 
     public String getPointcutExpression() {
