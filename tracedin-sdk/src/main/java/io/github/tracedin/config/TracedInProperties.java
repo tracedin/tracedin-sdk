@@ -25,9 +25,9 @@ public class TracedInProperties implements ApplicationContextAware {
      */
     private String endPoint = "http://localhost:8989";
 
-    private String serviceName = "service-" + UUID.randomUUID();
+    private boolean debug = false;
 
-    private String exporter = "traced-in";
+    private String serviceName = "service-" + UUID.randomUUID();
 
     private double sampling = 1.0;
 

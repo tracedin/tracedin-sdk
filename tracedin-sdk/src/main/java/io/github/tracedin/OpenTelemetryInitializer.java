@@ -18,61 +18,73 @@ import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
+
 import java.time.Duration;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class OpenTelemetryInitializer {
 
-
     public static void initialize(TracedInProperties properties) {
+        if (!properties.isEnabled()) return;
 
+        if (properties.isDebug()) {
+            setUpLoggingExporter();
+        } else {
+            setUpTracedinExporter(properties);
+        }
+    }
+
+    private static void setUpTracedinExporter(TracedInProperties properties) {
         Resource resource = Resource.getDefault().merge(
                 Resource.create(Attributes.builder()
                         .put("service.name", properties.getServiceName())
                         .put("project.key", properties.getProjectKey())
                         .build()));
 
-        SdkTracerProvider tracerProvider = null;
-        SdkMeterProvider meterProvider = null;
-        switch (properties.getExporter().toLowerCase()) {
-            case "traced-in" -> {
-                log.info("Initialized OpenTelemetry with TracedInSpanExporter to endpoint: {}", properties.getSpanEndpoint());
-                TracedInSpanExporter tracedInSpanExporter = new TracedInSpanExporter(properties.getSpanEndpoint());
-                tracerProvider = SdkTracerProvider.builder()
-                        .addSpanProcessor(BatchSpanProcessor.builder(tracedInSpanExporter).build())
-                        .setResource(resource)
-                        .setSampler(Sampler.traceIdRatioBased(properties.getSampling()))
-                        .build();
-                TracedInMetricExporter tracedInMetricExporter = new TracedInMetricExporter(
-                        properties.getMetricEndpoint());
-                meterProvider = SdkMeterProvider.builder()
-                        .setResource(resource)
-                        .registerMetricReader(PeriodicMetricReader.builder(tracedInMetricExporter)
-                                .setInterval(Duration.ofSeconds(properties.getMetricInterval()))
-                                .build())
-                        .build();
-            }
-            case "logging" -> {
-                log.info("Initialized OpenTelemetry with LoggingSpanExporter");
-                LoggingSpanExporter loggingExporter = new LoggingSpanExporter();
-                tracerProvider = SdkTracerProvider.builder()
-                        .addSpanProcessor(BatchSpanProcessor.builder(loggingExporter).build())
-                        .setResource(resource)
-                        .build();
-            }
-            default -> throw new IllegalArgumentException(
-                    "Unsupported exporter type: " + properties.getExporter());
-        };
+        log.info("Initialized OpenTelemetry with TracedInSpanExporter to endpoint: {}", properties.getSpanEndpoint());
+        TracedInSpanExporter tracedInSpanExporter = new TracedInSpanExporter(properties.getSpanEndpoint());
+
+        SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
+                .addSpanProcessor(BatchSpanProcessor.builder(tracedInSpanExporter).build())
+                .setResource(resource)
+                .setSampler(Sampler.traceIdRatioBased(properties.getSampling()))
+                .build();
+
+        log.info("Initialized OpenTelemetry with TracedInMetricExporter to endpoint: {}", properties.getMetricEndpoint());
+        TracedInMetricExporter tracedInMetricExporter = new TracedInMetricExporter(
+                properties.getMetricEndpoint());
+
+        SdkMeterProvider meterProvider = SdkMeterProvider.builder()
+                .setResource(resource)
+                .registerMetricReader(PeriodicMetricReader.builder(tracedInMetricExporter)
+                        .setInterval(Duration.ofSeconds(properties.getMetricInterval()))
+                        .build())
+                .build();
 
         OpenTelemetrySdk.builder()
                 .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
                 .setTracerProvider(tracerProvider)
                 .setMeterProvider(meterProvider)
                 .buildAndRegisterGlobal();
-
     }
 
+    private static void setUpLoggingExporter() {
+        Resource resource = Resource.getDefault();
+
+        log.info("Initialized OpenTelemetry with LoggingSpanExporter");
+        LoggingSpanExporter loggingExporter = new LoggingSpanExporter();
+        SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
+                .addSpanProcessor(BatchSpanProcessor.builder(loggingExporter).build())
+                .setResource(resource)
+                .build();
+
+        OpenTelemetrySdk.builder()
+                .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
+                .setTracerProvider(tracerProvider)
+                .buildAndRegisterGlobal();
+    }
 
     public static OpenTelemetry getOpenTelemetry() {
         return GlobalOpenTelemetry.get();
