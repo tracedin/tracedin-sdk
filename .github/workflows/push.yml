@@ -3,6 +3,8 @@ name: push
 on:
   push:
     branches: [ 'main' ]
+    paths:
+      - 'tracedin-sdk/**'
 
 defaults:
   run:
