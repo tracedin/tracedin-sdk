@@ -2,7 +2,7 @@ name: Build Docker Image for Demo
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths:
       - 'example/**'
 
