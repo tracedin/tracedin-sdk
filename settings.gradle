@@ -1,5 +1,5 @@
-rootProject.name = 'tracedin-example'
+rootProject.name = 'tracedin'
 
 include('tracedin-sdk')
-include('tracedin-client')
-include('tracedin-service')
+include('example:tracedin-client')
+include('example:tracedin-service')
