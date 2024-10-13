@@ -8,7 +8,7 @@ ARG OUTPUT=example/${APP_NAME}/build
 
 COPY . .
 
-RUN ./gradlew :example:tracedin-service:build
+RUN ./gradlew :example:${APP_NAME}:build
 
 RUN java -Djarmode=layertools -jar ${OUTPUT}/libs/${ARTIFACT_NAME}.jar extract --destination ${OUTPUT}/extracted
 
