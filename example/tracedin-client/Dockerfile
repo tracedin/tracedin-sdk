@@ -1,7 +1,7 @@
 FROM eclipse-temurin:17-jdk-alpine as build
 WORKDIR /workspace/app
 
-ARG APP_NAME=tracedin-service
+ARG APP_NAME=tracedin-client
 ARG VERSION=0.0.1
 ARG ARTIFACT_NAME=${APP_NAME}-${VERSION}
 ARG OUTPUT=example/${APP_NAME}/build
@@ -15,7 +15,7 @@ RUN java -Djarmode=layertools -jar ${OUTPUT}/libs/${ARTIFACT_NAME}.jar extract -
 FROM eclipse-temurin:17-jdk-alpine
 VOLUME /tmp
 
-ARG OUTPUT=example/tracedin-service/build
+ARG OUTPUT=example/tracedin-client/build
 ARG EXTRACTED=/workspace/app/${OUTPUT}/extracted
 
 COPY --from=build ${EXTRACTED}/dependencies/ ./
