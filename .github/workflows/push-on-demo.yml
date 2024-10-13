@@ -3,8 +3,6 @@ name: Build Docker Image for Demo
 on:
   push:
     branches: [ master, docker-compose ]
-    paths:
-      - 'example/**'
 
 env:
   DOCKER_IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
