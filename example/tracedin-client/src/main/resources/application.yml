@@ -3,7 +3,8 @@ spring:
     url: jdbc:h2:mem:db
   kafka:
     producer:
-      bootstrap-servers: localhost:29092
+      bootstrap-servers:
+        - localhost:29092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
@@ -14,6 +15,9 @@ traced-in:
   sampling: 1
   metric-interval: 10
   end-point: http://localhost:8989
+  demo:
+    service:
+      url: http://localhost:8081
 
 logging:
   level:

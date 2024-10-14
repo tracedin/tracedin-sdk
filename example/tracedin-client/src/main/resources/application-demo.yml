@@ -1,4 +1,13 @@
+spring:
+  kafka:
+    producer:
+      bootstrap-servers:
+       - ${KAFKA_ENDPOINT}
+
 traced-in:
   service-name: ${TRACEDIN_SERVICE_NAME}
   project-key: ${TRACEDIN_PROJECT_KEY}
   end-point: ${TRACEDIN_SERVER_ENDPOINT}
+  demo:
+    service:
+      url: ${TRACEDIN_SERVICE_ENDPOINT}

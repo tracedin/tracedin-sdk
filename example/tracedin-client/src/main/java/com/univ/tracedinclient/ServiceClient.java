@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @FeignClient(
         name = "service-client",
-        url = "http://localhost:8081",
+        url = "${traced-in.demo.service.url}",
         configuration = FeignConfig.class)
 public interface ServiceClient {
 
