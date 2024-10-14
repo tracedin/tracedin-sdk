@@ -40,7 +40,7 @@ services:
       TRACEDIN_SERVER_ENDPOINT: http://tracedin.p-e.kr
 
   tracedin-service:
-    image: ghcr.io/tracedin/tracedin.service.client:latest
+    image: ghcr.io/tracedin/tracedin.demo.service:latest
     depends_on:
       - kafka
       - tracedin-client
