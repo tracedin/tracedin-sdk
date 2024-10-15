@@ -1,0 +1,14 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:db
+
+traced-in:
+  service-name: tracedin-service
+  base-package: com.univ.tracedinservice
+  exporter: traced-in
+  project-key: 1206887328-a7863a66-528e-4f37-b805-04e1314fb924
+  sampling: 1
+  metric-interval: 10

@@ -38,7 +38,7 @@ public class TracedInMetricExporter implements MetricExporter {
     }
 
     @Override
-    public CompletableResultCode export(Collection<io.opentelemetry.sdk.metrics.data.MetricData> metrics) {
+    public CompletableResultCode export(Collection<MetricData> metrics) {
         CompletableResultCode resultCode = new CompletableResultCode();
         CompletableFuture.runAsync(() -> {
             boolean success = sendSpan(metrics);
