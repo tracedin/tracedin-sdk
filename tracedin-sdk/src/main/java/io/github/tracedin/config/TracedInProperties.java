@@ -20,9 +20,6 @@ public class TracedInProperties implements ApplicationContextAware {
      */
     private boolean enabled = true;
 
-    /**
-     * Exporter 엔드포인트 URL
-     */
     private String endPoint = "http://tracedin.p-e.kr";
 
     private String serviceName = "service-" + UUID.randomUUID();
