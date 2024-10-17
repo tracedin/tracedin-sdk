@@ -22,6 +22,8 @@ public class TracedInProperties implements ApplicationContextAware {
 
     private String endPoint = "http://tracedin.p-e.kr";
 
+    private boolean debug = false;
+
     private String serviceName = "service-" + UUID.randomUUID();
 
     private double sampling = 1.0;
@@ -71,7 +73,7 @@ public class TracedInProperties implements ApplicationContextAware {
     }
 
     public String getMetricEndpoint() {
-        return this.endPoint + "/api/v1/metrics";
+        return this.endPoint + "/api/v1/service-metrics";
     }
 
     public String getPointcutExpression() {

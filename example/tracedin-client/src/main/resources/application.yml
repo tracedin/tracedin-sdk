@@ -15,6 +15,7 @@ traced-in:
   sampling: 1
   metric-interval: 10
   end-point: http://localhost:8989
+
   demo:
     service:
       url: http://localhost:8081
