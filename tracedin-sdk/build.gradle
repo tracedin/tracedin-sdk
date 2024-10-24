@@ -46,7 +46,7 @@ dependencies {
     addOpenTelemetryInstrumentation('opentelemetry-jdbc','2.3.0-alpha')
     addOpenTelemetryInstrumentation('opentelemetry-kafka-clients-2.6','1.33.6-alpha')
 
-    implementation 'org.springframework.boot:spring-boot-starter-tomcat:3.3.3'
+    implementation 'org.springframework.boot:spring-boot-starter-tomcat:3.3.5'
     implementation 'org.springframework.boot:spring-boot-starter-json:3.3.3'
     implementation 'org.springframework.boot:spring-boot-starter-aop:3.3.3'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
