@@ -42,10 +42,10 @@ public class SystemMetricsCollector {
                 .setUnit("percent")
                 .buildWithCallback(measurement -> measurement.record(getSwapMemoryUsage()));
 
-        meter.gaugeBuilder("system.disk.usage")
-                .setDescription("Reports the disk usage percentage")
-                .setUnit("percent")
-                .buildWithCallback(result -> result.record(getDiskIOUsage()));
+//        meter.gaugeBuilder("system.disk.usage")
+//                .setDescription("Reports the disk usage percentage")
+//                .setUnit("percent")
+//                .buildWithCallback(result -> result.record(getDiskIOUsage()));
 
     }
 

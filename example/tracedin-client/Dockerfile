@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk-alpine as build
+FROM eclipse-temurin:17-jdk as build
 WORKDIR /workspace/app
 
 ARG APP_NAME=tracedin-client
@@ -12,7 +12,7 @@ RUN ./gradlew :example:${APP_NAME}:build --parallel
 
 RUN mkdir -p ${OUTPUT}/extracted && (java -Djarmode=layertools -jar ${OUTPUT}/libs/${ARTIFACT_NAME}.jar extract --destination ${OUTPUT}/extracted)
 
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:17-jdk
 
 ARG APP_NAME=tracedin-client
 ARG EXTRACTED=/workspace/app/example/${APP_NAME}/build/extracted

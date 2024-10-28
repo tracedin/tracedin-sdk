@@ -1,0 +1,56 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+    ports:
+      - "22181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "49092:49092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+  tracedin-client:
+    image: ghcr.io/tracedin/tracedin.demo.client:latest
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      TRACEDIN_SERVICE_NAME: tracedin-client
+      TRACEDIN_PROJECT_KEY: 1206887328-a7863a66-528e-4f37-b805-04e1314fb924
+      TRACEDIN_HOST: tracedin.p-e.kr
+      TRACEDIN_SERVICE_ENDPOINT: http://tracedin-service:8081
+      KAFKA_ENDPOINT: kafka:9092
+
+  tracedin-service:
+    image: ghcr.io/tracedin/tracedin.demo.service:latest
+    depends_on:
+      - kafka
+      - tracedin-client
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      TRACEDIN_SERVICE_NAME: tracedin-service
+      TRACEDIN_PROJECT_KEY: 1206887328-a7863a66-528e-4f37-b805-04e1314fb924
+      TRACEDIN_HOST: tracedin.p-e.kr
+      KAFKA_ENDPOINT: kafka:9092
+
+

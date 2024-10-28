@@ -1,9 +1,11 @@
 package io.github.tracedin.exporter.dto;
 
+import io.github.tracedin.exporter.grpc.ServiceMetricsProto;
 import io.opentelemetry.sdk.metrics.data.DoublePointData;
 import io.opentelemetry.sdk.metrics.data.LongPointData;
 import io.opentelemetry.sdk.metrics.data.MetricData;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public record MetricRequest(
@@ -83,5 +85,20 @@ public record MetricRequest(
                 max,
                 attributes
         );
+    }
+
+    public ServiceMetricsProto.MetricRequest toGrpcMetric() {
+        return ServiceMetricsProto.MetricRequest.newBuilder()
+                .setName(Optional.ofNullable(name).orElse(""))
+                .setDescription(Optional.ofNullable(description).orElse(""))
+                .setUnit(Optional.ofNullable(unit).orElse(""))
+                .setType(Optional.ofNullable(type).orElse(""))
+                .setValue(Optional.ofNullable(value).orElse(0.0))
+                .setCount(Optional.ofNullable(count).orElse(0L))
+                .setSum(Optional.ofNullable(sum).orElse(0.0))
+                .setMin(Optional.ofNullable(min).orElse(0.0))
+                .setMax(Optional.ofNullable(max).orElse(0.0))
+                .putAllAttributes(attributes)
+                .build();
     }
 }

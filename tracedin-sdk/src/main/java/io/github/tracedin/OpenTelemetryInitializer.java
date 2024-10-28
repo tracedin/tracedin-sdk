@@ -4,6 +4,7 @@ import io.github.tracedin.config.TracedInProperties;
 import io.github.tracedin.exporter.LoggingSpanExporter;
 import io.github.tracedin.exporter.TracedInMetricExporter;
 import io.github.tracedin.exporter.TracedInSpanExporter;
+import io.github.tracedin.exporter.grpc.GrpcClient;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
@@ -11,8 +12,6 @@ import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
-import io.opentelemetry.sdk.metrics.export.MetricProducer;
-import io.opentelemetry.sdk.metrics.export.MetricReader;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
@@ -21,9 +20,11 @@ import io.opentelemetry.sdk.trace.samplers.Sampler;
 
 import java.time.Duration;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class OpenTelemetryInitializer {
 
     public static void initialize(TracedInProperties properties) {
@@ -37,14 +38,14 @@ public class OpenTelemetryInitializer {
     }
 
     private static void setUpTracedinExporter(TracedInProperties properties) {
+        GrpcClient grpcClient = new GrpcClient(properties.getHost());
         Resource resource = Resource.getDefault().merge(
                 Resource.create(Attributes.builder()
                         .put("service.name", properties.getServiceName())
                         .put("project.key", properties.getProjectKey())
                         .build()));
 
-        log.info("Initialized OpenTelemetry with TracedInSpanExporter to endpoint: {}", properties.getSpanEndpoint());
-        TracedInSpanExporter tracedInSpanExporter = new TracedInSpanExporter(properties.getSpanEndpoint());
+        TracedInSpanExporter tracedInSpanExporter = new TracedInSpanExporter(grpcClient);
 
         SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
                 .addSpanProcessor(BatchSpanProcessor.builder(tracedInSpanExporter).build())
@@ -52,9 +53,7 @@ public class OpenTelemetryInitializer {
                 .setSampler(Sampler.traceIdRatioBased(properties.getSampling()))
                 .build();
 
-        log.info("Initialized OpenTelemetry with TracedInMetricExporter to endpoint: {}", properties.getMetricEndpoint());
-        TracedInMetricExporter tracedInMetricExporter = new TracedInMetricExporter(
-                properties.getMetricEndpoint());
+        TracedInMetricExporter tracedInMetricExporter = new TracedInMetricExporter(grpcClient);
 
         SdkMeterProvider meterProvider = SdkMeterProvider.builder()
                 .setResource(resource)

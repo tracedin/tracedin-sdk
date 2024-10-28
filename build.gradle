@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.3'
-    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.springframework.boot' version '3.2.7'
+    id 'io.spring.dependency-management' version '1.1.5'
 }
 
 
@@ -34,4 +34,14 @@ subprojects {
 
 bootJar {
     enabled = false
+}
+
+project(':example') {
+    bootJar {
+        enabled = false
+    }
+
+    jar {
+        enabled = false
+    }
 }

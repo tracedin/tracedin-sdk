@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option java_package = "io.github.tracedin.exporter.grpc";
+option java_outer_classname = "SpanProto";
+
+message Span {
+  string service_name = 1;
+  string project_key = 2;
+  string trace_id = 3;
+  string span_id = 4;
+  string parent_span_id = 5;
+  string span_type = 6;
+  string name = 7;
+  string kind = 8;
+  int64 start_epoch_nanos = 9;
+  int64 end_epoch_nanos = 10;
+  string span_status = 11;
+  Attributes attributes = 12;
+  repeated Event events = 13;
+}
+
+message Attributes {
+  map<string, string> data = 1;
+  int32 capacity = 2;
+  int32 total_added_values = 3;
+}
+
+message Event {
+  string name = 1;
+  map<string, string> attributes = 2;
+  int64 epoch_nanos = 3;
+}
+
+message AppendSpansRequest {
+  repeated Span spans = 1;
+}
+
+message AppendSpanResponse {
+  int64 status_code = 1;
+}
+
+service SpanGrpcAppender {
+  rpc AppendSpans (AppendSpansRequest) returns (AppendSpanResponse);
+}
+
+

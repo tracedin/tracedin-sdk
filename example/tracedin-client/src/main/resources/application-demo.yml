@@ -7,7 +7,7 @@ spring:
 traced-in:
   service-name: ${TRACEDIN_SERVICE_NAME}
   project-key: ${TRACEDIN_PROJECT_KEY}
-  end-point: ${TRACEDIN_SERVER_ENDPOINT}
+  host: ${TRACEDIN_HOST}
   demo:
     service:
       url: ${TRACEDIN_SERVICE_ENDPOINT}

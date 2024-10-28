@@ -6,15 +6,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.tracedin.exporter.dto.AppendServiceMetricsRequest;
 import io.github.tracedin.exporter.dto.MetricRequest;
+import io.github.tracedin.exporter.grpc.GrpcClient;
+import io.github.tracedin.exporter.grpc.ServiceMetricsProto;
+import io.github.tracedin.exporter.grpc.ServiceMetricsProto.AppendServiceMetricsResponse;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.metrics.InstrumentType;
 import io.opentelemetry.sdk.metrics.data.AggregationTemporality;
 import io.opentelemetry.sdk.metrics.data.MetricData;
 import io.opentelemetry.sdk.metrics.export.MetricExporter;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -25,15 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TracedInMetricExporter implements MetricExporter {
 
-    private final String endpoint;
-    private final HttpClient httpClient;
-    private final ObjectMapper objectMapper;
+    private final GrpcClient grpcClient;
     private final ExecutorService executorService;
 
-    public TracedInMetricExporter(String endpoint) {
-        this.endpoint = endpoint;
-        this.httpClient = createHttpClient();
-        this.objectMapper = createObjectMapper();
+    public TracedInMetricExporter(GrpcClient grpcClient) {
+        this.grpcClient = grpcClient;
         this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
@@ -82,39 +79,30 @@ public class TracedInMetricExporter implements MetricExporter {
         };
     }
 
-    private boolean sendSpan(Collection<io.opentelemetry.sdk.metrics.data.MetricData> metrics) {
+    private boolean sendSpan(Collection<MetricData> metrics) {
         try {
-            String json = serializeSpanDataToJson(metrics);
-            HttpRequest request = buildHttpRequest(json);
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            ServiceMetricsProto.AppendServiceMetricsRequest request = toGrpcServiceMetrics(metrics);
+            AppendServiceMetricsResponse response = grpcClient.appendServiceMetrics(request);
 
-            if (response.statusCode() != 200) {
-                log.error("Failed to send span. Status code: {}, Response: {}", response.statusCode(), response.body());
+            if (response.getStatusCode() != 200) {
+                log.error("Failed to send span. Status code: {}", response.getStatusCode());
                 return false;
             }
-
             log.info("Successfully sent metrics");
             return true;
         } catch (Exception e) {
-            log.error("Error while sending metrics");
+            log.error("Error while sending metrics", e);
             return false;
         }
     }
 
-    private HttpRequest buildHttpRequest(String json) {
-        return HttpRequest.newBuilder()
-                .uri(URI.create(endpoint))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
+    private ServiceMetricsProto.AppendServiceMetricsRequest toGrpcServiceMetrics(Collection<MetricData> metrics) {
+        List<MetricRequest> metricData = metrics.stream().map(MetricRequest::from).toList();
+        AppendServiceMetricsRequest requestDto = AppendServiceMetricsRequest.from(metricData);
+        return ServiceMetricsProto.AppendServiceMetricsRequest.newBuilder()
+                .setProjectKey(requestDto.projectKey())
+                .setServiceName(requestDto.serviceName())
+                .addAllMetrics(requestDto.metrics().stream().map(MetricRequest::toGrpcMetric).toList())
                 .build();
-    }
-
-    private String serializeSpanDataToJson(Collection<MetricData> metrics) {
-        try {
-            List<MetricRequest> metricData = metrics.stream().map(MetricRequest::from).toList();
-            return objectMapper.writeValueAsString(AppendServiceMetricsRequest.from(metricData));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option java_package = "io.github.tracedin.exporter.grpc";
+option java_outer_classname = "ServiceMetricsProto";
+
+message AppendServiceMetricsRequest {
+  string project_key = 1;
+  string service_name = 2;
+  repeated MetricRequest metrics = 3;
+}
+
+message MetricRequest {
+  string name = 1;
+  string description = 2;
+  string unit = 3;
+  string type = 4;
+  double value = 5; // GAUGE 및 SUM 타입의 단일 값
+  int64 count = 6;  // HISTOGRAM 타입의 카운트
+  double sum = 7;   // HISTOGRAM 타입의 합계
+  double min = 8;   // HISTOGRAM 타입의 최소값
+  double max = 9;   // HISTOGRAM 타입의 최대값
+  map<string, string> attributes = 10; // 속성 정보
+}
+message AppendServiceMetricsResponse {
+  int64 status_code = 1;
+}
+
+
+service ServiceMetricsGrpcAppender {
+  rpc AppendServiceMetrics (AppendServiceMetricsRequest) returns (AppendServiceMetricsResponse);
+}

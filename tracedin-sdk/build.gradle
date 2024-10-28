@@ -2,19 +2,27 @@ import com.vanniktech.maven.publish.SonatypeHost
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 
+buildscript {
+    ext {
+        protobufVersion = '3.21.5'
+        protobufPluginVersion = '0.9.4'
+        grpcVersion = '1.65.1'
+    }
+}
+
 plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
     id 'com.vanniktech.maven.publish' version '0.29.0'
     id 'signing'
+    id 'com.google.protobuf' version "${protobufPluginVersion}"
 }
 
 group = 'io.github.tracedin'
 version = '0.0.4'
 
-def artifact = 'tracedin-sdk'
-
+def artifactName = 'tracedin-sdk'
 
 java {
     toolchain {
@@ -25,8 +33,6 @@ java {
 repositories {
     mavenCentral()
 }
-
-
 // https://stackoverflow.com/questions/78925084/spring-boot-starter-opentelemetry-getting-clasnotfound-for-doublegauge
 def addOpenTelemetryInstrumentation(String module, String version) {
     dependencies {
@@ -51,6 +57,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop:3.3.3'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
 
+    // grpc 서버, 클라이언트 설정
+    implementation 'net.devh:grpc-spring-boot-starter:3.1.0.RELEASE'
+    // Spring Boot와 gRPC의 통합을 간편하게 도와주는 스타터
+    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    // Netty Shaded 사용(gRPC 서버와 클라이언트의 Netty 전송 계층을 제공)
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"     // Protobuf 메시지와 gRPC의 통합을 지원
+    implementation "io.grpc:grpc-stub:${grpcVersion}"         // gRPC 클라이언트 스텁을 생성
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
+    // 이걸 추가해야 gRPC 컴파일시 javax 어노테이션 오류가 발생하지 않는다.
+
 
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.3'
 
@@ -67,6 +83,29 @@ dependencies {
     implementation 'com.zaxxer:HikariCP:5.1.0'
 }
 
+protobuf {
+    // Protobuf 컴파일러를 지정하여 .proto 파일을 컴파일합니다.
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+    }
+    // 생성된 파일을 정리합니다.
+    clean {
+        delete generatedFilesBaseDir
+    }
+    // gRPC 플러그인을 설정하여 Protobuf 파일로부터 gRPC 관련 코드를 생성합니다.
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+        }
+    }
+    // 모든 프로토콜 버퍼 작업에 대해 gRPC 플러그인을 적용합니다.
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
 signing {
     useGpgCmd()
     sign publishing.publications
@@ -75,10 +114,10 @@ signing {
 mavenPublishing {
     configure(new JavaLibrary(new JavadocJar.Empty(), true))
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, true)
-    coordinates(group, artifact, version)
+    coordinates(group, artifactName, version)
 
     pom {
-        name = artifact
+        name = artifactName
         description = 'Tracedin Application SDK for Java'
         url = 'https://tracedin.github.io'
 

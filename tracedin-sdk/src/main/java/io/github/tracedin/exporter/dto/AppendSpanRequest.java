@@ -1,11 +1,18 @@
 package io.github.tracedin.exporter.dto;
 
+import io.github.tracedin.exporter.grpc.SpanProto;
+import io.github.tracedin.exporter.grpc.SpanProto.Attributes;
+import io.github.tracedin.exporter.grpc.SpanProto.Event;
+import io.github.tracedin.exporter.grpc.SpanProto.Span;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public record AppendSpanRequest(
         String serviceName,
@@ -21,6 +28,8 @@ public record AppendSpanRequest(
         long endEpochNanos,
         Attributes attributes,
         List<Event> events) {
+
+
 
     public record Attributes(Map<String, Object> data, int capacity, int totalAddedValues) {
         public static Attributes from(SpanData spanData) {
@@ -65,5 +74,40 @@ public record AppendSpanRequest(
                 attributes,
                 events
         );
+    }
+
+    public Span toGrpcSpan() {
+        return Span.newBuilder()
+                .setServiceName(serviceName)
+                .setProjectKey(projectKey)
+                .setTraceId(traceId)
+                .setSpanId(spanId)
+                .setParentSpanId(parentSpanId)
+                .setSpanType(Optional.ofNullable(spanType).orElse(""))
+                .setName(name)
+                .setKind(kind)
+                .setSpanStatus(spanStatus)
+                .setStartEpochNanos(startEpochNanos)
+                .setEndEpochNanos(endEpochNanos)
+                .setAttributes(
+                        SpanProto.Attributes.newBuilder()
+                                .putAllData(attributes.data().entrySet().stream()
+                                        .collect(Collectors.toMap(
+                                                Entry::getKey,
+                                                e -> String.valueOf(e.getValue()))))
+                                .setCapacity(attributes.capacity())
+                                .setTotalAddedValues(attributes.totalAddedValues())
+                                .build())
+                .addAllEvents(events.stream()
+                        .map(event -> SpanProto.Event.newBuilder()
+                                .setName(event.name())
+                                .putAllAttributes(event.attributes().entrySet().stream()
+                                        .collect(Collectors.toMap(
+                                                Entry::getKey,
+                                                e -> String.valueOf(e.getValue()))))
+                                .setEpochNanos(event.epochNanos())
+                                .build())
+                        .toList())
+                .build();
     }
 }
