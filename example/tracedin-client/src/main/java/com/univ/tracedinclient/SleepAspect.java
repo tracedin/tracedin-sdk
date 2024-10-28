@@ -14,7 +14,7 @@ public class SleepAspect {
 
     @Before("execution(* com.univ.tracedinclient..*(..))")
     public void addSleep() throws InterruptedException {
-        if (random.nextInt(100) < 5) { // 0~4일 때, 5% 확률
+        if (random.nextInt(1_000_00) < 1) { // 0.001% 확률로 이상치
             int sleepTime = 1000 + random.nextInt(1000); // 1000ms~2000ms (1~2초)
             Thread.sleep(sleepTime);
         }
