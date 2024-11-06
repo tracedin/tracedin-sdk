@@ -80,7 +80,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
-    implementation 'com.zaxxer:HikariCP:5.1.0'
+    implementation 'com.zaxxer:HikariCP:6.1.0'
 }
 
 protobuf {
