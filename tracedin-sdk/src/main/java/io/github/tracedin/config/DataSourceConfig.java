@@ -19,6 +19,6 @@ public class DataSourceConfig {
         log.info("Initializing OpenTelemetry DataSource");
         OpenTelemetry openTelemetry = OpenTelemetryInitializer.getOpenTelemetry();
         DataSource dataSource = properties.initializeDataSourceBuilder().build();
-        return JdbcTelemetry.create(openTelemetry).wrap(dataSource);
+        return JdbcTelemetry.builder(openTelemetry).setStatementSanitizationEnabled(false).build().wrap(dataSource);
     }
 }

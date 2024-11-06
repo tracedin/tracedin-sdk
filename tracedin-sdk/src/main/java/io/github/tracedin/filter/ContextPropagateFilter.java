@@ -28,24 +28,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class ContextPropagateFilter extends OncePerRequestFilter {
 
     private final Tracer tracer;
-    private final LongCounter httpCounter;
 
     public ContextPropagateFilter(TracedInProperties properties) {
         this.tracer = OpenTelemetryInitializer.getOpenTelemetry()
-                .getTracer(properties.getBasePackage());;
-        this.httpCounter = GlobalOpenTelemetry.getMeter(properties.getBasePackage())
-                .counterBuilder("http.request.count")
-                .setDescription("Total HTTP request count")
-                .setUnit("1")
-                .build();
+                .getTracer(properties.getBasePackage());
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-
-        httpCounter.add(1, Attributes.of(stringKey("http.method"), request.getMethod(), stringKey("http.path"), request.getRequestURI()));
 
         Context extractedContext = getExtract(request);
 
@@ -59,7 +51,7 @@ public class ContextPropagateFilter extends OncePerRequestFilter {
         try (Scope scope = span.makeCurrent()) {
             span.setAttribute("span.type", "http");
             span.setAttribute("http.method", request.getMethod());
-            span.setAttribute("http.url", request.getRequestURL().toString());
+            span.setAttribute("http.url", extractEndpoint(request.getRequestURL().toString()));
             filterChain.doFilter(request, response);
         } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -98,5 +90,10 @@ public class ContextPropagateFilter extends OncePerRequestFilter {
         return GlobalOpenTelemetry.getPropagators()
                 .getTextMapPropagator()
                 .extract(Context.current(), request, getter);
+    }
+
+    private String extractEndpoint(String url) {
+        int index = url.indexOf("/", url.indexOf("://") + 3);
+        return (index != -1) ? url.substring(index) : "/";
     }
 }
