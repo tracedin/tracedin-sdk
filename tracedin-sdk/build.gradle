@@ -46,8 +46,8 @@ def addOpenTelemetryInstrumentation(String module, String version) {
 
 dependencies {
     implementation 'io.opentelemetry:opentelemetry-sdk:1.37.0'
-    implementation 'io.opentelemetry:opentelemetry-api:1.37.0'
-    implementation 'io.opentelemetry:opentelemetry-api-incubator:1.37.0-alpha'
+    implementation 'io.opentelemetry:opentelemetry-api:1.44.0'
+    implementation 'io.opentelemetry:opentelemetry-api-incubator:1.44.0-alpha'
 
     addOpenTelemetryInstrumentation('opentelemetry-jdbc','2.3.0-alpha')
     addOpenTelemetryInstrumentation('opentelemetry-kafka-clients-2.6','1.33.6-alpha')
