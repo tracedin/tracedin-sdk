@@ -8,3 +8,4 @@ traced-in:
   service-name: ${TRACEDIN_SERVICE_NAME}
   project-key: ${TRACEDIN_PROJECT_KEY}
   host: ${TRACEDIN_HOST}
+  metric-interval: ${TRACEDIN_METRIC_INTERVAL:10}

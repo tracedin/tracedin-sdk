@@ -11,3 +11,4 @@ traced-in:
   demo:
     service:
       url: ${TRACEDIN_SERVICE_ENDPOINT}
+  metric-interval: ${TRACEDIN_METRIC_INTERVAL:10}
