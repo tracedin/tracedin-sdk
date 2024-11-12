@@ -31,5 +31,17 @@ public class HelloApi {
         return "Message Sent!";
     }
 
+    @GetMapping("/error")
+    public String error() {
+        helloService.error();
+        return "Error!";
+    }
+
+    @GetMapping("/anomaly")
+    public String anomaly() {
+        helloService.anomaly();
+        return "Anomaly!";
+    }
+
 
 }

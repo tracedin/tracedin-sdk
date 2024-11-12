@@ -14,6 +14,7 @@ traced-in:
   project-key: 1206887328-a7863a66-528e-4f37-b805-04e1314fb924
   sampling: 1
   metric-interval: 10
+  host: localhost
 
   demo:
     service:
